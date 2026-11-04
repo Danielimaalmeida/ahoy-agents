@@ -1,0 +1,66 @@
+# Machine-readable projection of knowledge/process/delivery-phases.md.
+# The Ahoy hosted harness routes stories by this file, read at the commit each
+# story pins when it is created. The prose doc stays authoritative for humans
+# and for what each actor does; this decides routing. Keep them in sync.
+#
+# There is no row before intake: the harness creates the story's state from
+# state.template.json when the story is created through the API, and runs its
+# preflight before any phase.
+#
+# kind:
+#   auto           run the actor (if any), then the gate
+#   implementation one run per work package; child_ready per repository, and
+#                  when ALL pass, pr; then advance
+#   human          advance only when a person approves human_gate_key through
+#                  the API
+#   terminal       stop
+#
+# actor: the agent profile in .github/agents/ that runs the phase, or a harness
+#      step: `ahoy dispatch` (implementation: the implementer of each work
+#      package comes from the plan and agent-mappings.md). pr_review names the
+#      one reviewer agent (D17); `ahoy review` is refused.
+#
+# gate: the harness's gate for the phase. pr_review's is `review`; a row that
+#      still names `consensus` halts the story before the reviewer runs.
+#
+# on_fail (gate fail): a phase name, or `stay` to remain and be re-run later.
+# on_branch (gate branch): a phase name, or `-` if the gate cannot branch.
+# log: decision log entry type to append, or `-` for none. Routine passing
+#      transitions are not logged; the events and gate records already hold
+#      them.
+#
+# interactive: ignored by the hosted harness. No run waits for a person: the
+#      planner asks its questions in specs/<STORY-ID>/questions.json and stops,
+#      a person answers through the API, and planning runs again.
+#
+# model / effort: what this phase's actor runs on, or `-` to say nothing.
+#      What wins, first to last: a revision's override, the story's own choice
+#      (through the API), the harness's phase configuration, this cell, the
+#      agent profile's `model:`. The harness's built-in configuration names a
+#      model for intake, planning and pr_review, so a cell here only counts
+#      where the configuration names none (implementation, by default). Fill a
+#      cell only to override deliberately.
+#
+#      Effort levels: low medium high xhigh max, or `-`.
+#
+# on_fail for `planning` is `stay`, not `blocked`: a planning run that ends
+# without a plan (waiting on answers, or out of time) is unfinished, not
+# failed, and the next run picks up where it stopped.
+#
+# design: passes as skipped unless the plan has a UI work package and the Jira
+#      snapshot links a Figma node. Otherwise the harness reads the frames over
+#      the Figma REST API (FIGMA_TOKEN) into specs/<STORY-ID>/design/, then the
+#      actor writes design/density.md, which the `design` gate judges. A
+#      rejected pack halts; the reason goes to the actor's next run.
+#
+# phase	kind	actor	gate	on_pass	on_branch	on_fail	human_gate_key	log	interactive	model	effort
+intake	auto	intake-analyst	intake	planning	-	blocked	-	blocked	no	-	-
+planning	auto	planner	plan	plan_review	-	stay	-	-	yes	-	-
+plan_review	human	-	-	design	-	-	plan_accepted	human_approval	no	-	-
+design	auto	density-reader	design	implementation	-	-	-	-	no	-	-
+implementation	implementation	ahoy dispatch	child_ready	pr_review	implementation	stay	-	-	no	-	-
+pr_review	auto	reviewer	review	delivery_gate	rework	stay	-	-	no	-	-
+rework	auto	-	-	implementation	-	-	-	-	no	-	-
+delivery_gate	human	-	-	done	-	-	delivery_accepted	human_approval	no	-	-
+done	terminal	-	-	-	-	-	-	-	no	-	-
+blocked	terminal	-	-	-	-	-	-	-	no	-	-

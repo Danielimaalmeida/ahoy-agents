@@ -1,0 +1,18 @@
+{
+  "story_id": "",
+  "jira_url": null,
+  "title": null,
+  "phase": "intake",
+  "plan_path": null,
+  "rework_ceiling": 3,
+  "intake_analyst": null,
+  "acceptance_criteria": [],
+  "child_repos": [],
+  "reviewer_reviews": [],
+  "gate_results": [],
+  "decision_log": [],
+  "human_gates": {
+    "plan_accepted": { "status": "pending", "timestamp": null },
+    "delivery_accepted": { "status": "pending", "timestamp": null }
+  }
+}

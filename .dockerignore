@@ -1,0 +1,26 @@
+# Only what `bin/ahoy serve` and the verbs it runs need goes into the image.
+.git
+.github/workflows
+.gitattributes
+.dockerignore
+Dockerfile
+.env
+.env.*
+*.env
+.envrc
+*.local
+**/secrets.*
+**/__pycache__
+**/*.pyc
+.DS_Store
+.vscode
+.playwright-mcp
+venv
+.venv
+.venv-e2e
+work
+workspaces
+tests
+image.png
+# Delivery state is mounted at run time, never baked into an image.
+specs/*
