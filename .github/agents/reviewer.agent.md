@@ -71,6 +71,10 @@ a special case.
 
 Do not restate what linters or static analysis already report, and do not review taste.
 
+A pull request comment by a person is not judged against the plan alone: follow the prompt's rule for people's
+comments. A colleague's reasonable, contained improvement is accepted even when the plan does not ask for it, and
+the Scope line and "do not review taste" apply to your own findings, not to it.
+
 ## Severity, and what it does
 
 The gate acts on severity, so choose it for its consequence:
