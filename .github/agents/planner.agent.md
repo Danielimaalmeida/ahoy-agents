@@ -16,7 +16,24 @@ truth and never silently rewrite Jira or substitute unsourced facts.
 Read and write `specs/<STORY-ID>/` in the workspace you are started in. Those
 are the files the harness reads when you finish.
 
-Before drafting the implementation plan, read the central `knowledge/INDEX.md` and the product context it points to for the story's area (`knowledge/product/`, `knowledge/system/glossary.md`, `knowledge/system/integrations-map.md`), the repository inventory and routing information under `knowledge/system/`, and the applicable agent-to-repository mappings and local conventions under `knowledge/repositories/`. Determine every affected repository from the Jira story and Intake analyst context. For each affected repository, read its live `.github/copilot-instructions.md`, `.github/instructions/`, applicable `.github/skills/`, workflows and CI configuration, manifests, and relevant source paths. Use the discovered repository conventions and skills to shape work packages, specialist routing, validation, and evidence requirements. Treat curated `knowledge/` as context, but treat current live repository files as authoritative when they differ. If an affected repository, required local guidance, or relevant source context is unavailable, stop as `BLOCKED` and state exactly what is missing rather than guessing.
+Before drafting the implementation plan, read the central `knowledge/INDEX.md` and the product context it points to for the story's area (`knowledge/product/`, `knowledge/system/glossary.md`, `knowledge/system/integrations-map.md`), the repository inventory and routing information under `knowledge/system/`, and the applicable agent-to-repository mappings and local conventions under `knowledge/repositories/`. Determine every affected repository from the Jira story, the Intake analyst context and the routing, as `### Finding the affected repositories` below says. For each affected repository, read its live `.github/copilot-instructions.md`, `.github/instructions/`, applicable `.github/skills/`, workflows and CI configuration, manifests, and relevant source paths. Use the discovered repository conventions and skills to shape work packages, specialist routing, validation, and evidence requirements. Treat curated `knowledge/` as context, but treat current live repository files as authoritative when they differ. If an affected repository, required local guidance, or relevant source context is unavailable, stop as `BLOCKED` and state exactly what is missing rather than guessing.
+
+### Finding the affected repositories
+
+A story does not have to name its repositories, and a defect usually does not. When it names none, or names only
+some, find them yourself; never stop to ask a person which repository a story touches.
+
+1. Start from the routing: the repository inventory and routing under `knowledge/system/` and the plan aliases in
+   `knowledge/repositories/agent-mappings.md`. Match what the story names (a screen, a route, an endpoint, an error
+   message, a Jira component, a log line) to the repository that owns it.
+2. For a defect, begin with the product's entry repositories, the ones the routing says users and callers come in
+   through (most defects enter through the product's backend and frontend), and follow the trace from there.
+3. Confirm in the clones the harness gave you: find the code that produces the behaviour the story describes. A
+   repository you plan work in must be one whose source you read.
+4. Plan only the repositories the change needs. The routing tells you where to look, not where to change.
+
+Record in `plan-sources.md` how you found each repository: the routing entry and the source path that confirmed it.
+Stop as `BLOCKED` only when the trace leads to a repository that is not mapped or not cloned, and name it.
 
 ### Classify validation before expanding scope
 
