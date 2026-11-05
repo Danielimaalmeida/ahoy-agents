@@ -16,7 +16,7 @@ truth and never silently rewrite Jira or substitute unsourced facts.
 Read and write `specs/<STORY-ID>/` in the workspace you are started in. Those
 are the files the harness reads when you finish.
 
-Before drafting the implementation plan, read the central `knowledge/INDEX.md` and the product context it points to for the story's area (`knowledge/product/`, `knowledge/system/glossary.md`, `knowledge/system/integrations-map.md`), the repository inventory and routing information under `knowledge/system/`, and the applicable agent-to-repository mappings and local conventions under `knowledge/repositories/`. Determine every affected repository from the Jira story, the Intake analyst context and the routing, as `### Finding the affected repositories` below says. For each affected repository, read its live `.github/copilot-instructions.md`, `.github/instructions/`, applicable `.github/skills/`, workflows and CI configuration, manifests, and relevant source paths. Use the discovered repository conventions and skills to shape work packages, specialist routing, validation, and evidence requirements. Treat curated `knowledge/` as context, but treat current live repository files as authoritative when they differ. If an affected repository, required local guidance, or relevant source context is unavailable, stop as `BLOCKED` and state exactly what is missing rather than guessing.
+Before drafting the implementation plan, read the central `knowledge/INDEX.md` and the product context it points to for the story's area (`knowledge/product/`, `knowledge/system/glossary.md`, `knowledge/system/integrations-map.md`), the repository inventory and routing information under `knowledge/system/`, and the applicable agent-to-repository mappings and local conventions under `knowledge/repositories/`. Determine every affected repository from the Jira story, the Intake analyst context and the routing, as `### Finding the affected repositories` below says. For each affected repository, read its live `.github/copilot-instructions.md`, `.github/instructions/`, applicable `.github/skills/`, workflows and CI configuration, manifests, and relevant source paths. Use the discovered repository conventions and skills to shape work packages, specialist routing, validation, and evidence requirements. Treat curated `knowledge/` as context, but treat current live repository files as authoritative when they differ. If an affected repository you found is not mapped or not cloned, or its required local guidance or relevant source context is unavailable, stop as `BLOCKED` and state exactly what is missing rather than guessing. A story that does not name its repositories is never by itself a reason to stop.
 
 ### Finding the affected repositories
 
@@ -32,8 +32,12 @@ some, find them yourself; never stop to ask a person which repository a story to
    repository you plan work in must be one whose source you read.
 4. Plan only the repositories the change needs. The routing tells you where to look, not where to change.
 
+If the trace finds no code that produces the behaviour, or two repositories fit equally well, ask a behavioural
+question in `questions.json` (what the person did, where, and what they saw) with your recommended answer, never which
+repository to change. When the evidence still points one way, plan it and record the choice as an assumption.
+
 Record in `plan-sources.md` how you found each repository: the routing entry and the source path that confirmed it.
-Stop as `BLOCKED` only when the trace leads to a repository that is not mapped or not cloned, and name it.
+When the trace leads to a repository that is not mapped or not cloned, stop as `BLOCKED` and name it.
 
 ### Classify validation before expanding scope
 
@@ -62,8 +66,8 @@ them. If stronger validation would require new infrastructure, record the gap
 or ask a focused question instead of silently expanding the delivery.
 
 **Provenance goes in `specs/<STORY-ID>/plan-sources.md`, not in the plan.** The
-knowledge files consulted, the live repository files read, and each
-repository's inspected commit are worth recording, but nobody implementing or
+knowledge files consulted, how each repository was found, the live repository
+files read, and each repository's inspected commit are worth recording, but nobody implementing or
 reviewing the plan needs them, and the plan is copied into every implementer's
 workspace and read by the reviewer. Write that inventory to `plan-sources.md`
 and keep a one-line pointer to it in the plan. Refresh it on every revision.
