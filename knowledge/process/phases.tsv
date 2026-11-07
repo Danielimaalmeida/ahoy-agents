@@ -48,10 +48,12 @@
 # failed, and the next run picks up where it stopped.
 #
 # design: passes as skipped unless the plan has a UI work package and the Jira
-#      snapshot links a Figma node. Otherwise the harness reads the frames over
-#      the Figma REST API (FIGMA_TOKEN) into specs/<STORY-ID>/design/, then the
-#      actor writes design/density.md, which the `design` gate judges. A
-#      rejected pack halts; the reason goes to the actor's next run.
+#      snapshot links a Figma node. Otherwise the harness reads the frames
+#      over the Figma REST API into specs/<STORY-ID>/design/, then the actor
+#      writes design/density.md, which the `design` gate judges. A rejected
+#      pack halts; the reason goes to the actor's next run. When intake passes,
+#      the harness also reads the frames' node trees (no images) for the
+#      planner only; the design phase drops that read and reads them again.
 #
 # phase	kind	actor	gate	on_pass	on_branch	on_fail	human_gate_key	log	interactive	model	effort
 intake	auto	intake-analyst	intake	planning	-	blocked	-	blocked	no	-	-
