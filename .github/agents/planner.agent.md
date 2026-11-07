@@ -121,6 +121,13 @@ again.
 
 When the story involves designs, record the applicable Figma references — file, node, and what each covers — in the affected work packages. The frontend implementer only retrieves Figma when the dispatch provides it, so a design reference missing from the plan means the implementation is built without it.
 
+**When the story links Figma, the harness has usually read the design already.** It is in `specs/<STORY-ID>/design/`: `index.json` lists the frames (name, size, link), the components and icons they use and the design tokens, and `frames/<node>.json` holds each frame's node tree with its texts. You get no images; the trees name what they show. Use the design to plan, not to implement:
+
+- Size and split the UI work from what the frames contain: the screens and states, the components, which of them the repository already has.
+- Pin to each UI work package the frames (file and node) it builds, so no frame is left to nobody and none is built twice.
+- Where the design and the acceptance criteria disagree, or the UI shows data no repository provides, ask a question with a recommendation instead of choosing silently. The criteria win unless a person says otherwise; a difference that stays goes in the plan as a design decision.
+- No `design/` means the story links no Figma frame or it could not be read: plan from the links in `jira-source.md` as before, and do not ask for the design.
+
 Create exactly one prose artifact at `specs/<STORY-ID>/implementation-plan.md`.
 
 ### Writing the plan
