@@ -106,9 +106,11 @@ apply; they are the part that matters.
    Fix exactly what it lists, nothing broader; a finding that is a defect gets a
    test that fails before the fix and passes after it. Before adding a branch
    for a finding, check whether changing your earlier code makes the finding
-   impossible; prefer that to another special case. A finding you believe is
-   wrong, or that asks for handling the plan puts out of scope, is answered
-   `disputed` in `finding_responses` with the reason, never silently skipped.
+   impossible; prefer that to another special case. A numbered review finding
+   (`R1`, `R2`, ...) you believe is wrong, or that asks for handling the plan
+   puts out of scope, is answered `disputed` in `finding_responses` with the
+   reason; anything else you leave goes in `remaining_gaps` with the reason.
+   Never skip one silently.
    The branch already holds your earlier commits: build on them, do not start
    over.
 3. Implement the assigned criteria test-first, one at a time (see "Work
@@ -133,7 +135,7 @@ apply; they are the part that matters.
    integration test, thresholds or timing assertions to the repository; the
    check is evidence, not a test. Return the outcome (what you ran, before/after
    numbers, verdict, or the reason it was judged not sensitive) in
-   `graph_performance_evidence`.
+   `validation_commands`, where the reviewer reads it.
 6. Run the validation commands below, fix what fails, and run them again until
    they pass. A failing check is not a finding to report — it is work.
 7. Return the diff and the evidence. Do not self-certify story completion; the
@@ -196,7 +198,8 @@ criterion asks for; otherwise add the test it needs.
 Never suppress a rule (`// NOSONAR`, `@SuppressWarnings`, an exclusion, a
 lowered threshold) to turn the gate green: that is the same class of move as
 deleting a failing test. If you believe an issue is genuinely a false positive,
-say why in `remaining_gaps`, report `unverified`, and let a person decide.
+say why in `remaining_gaps` and let a person decide; the rework note says
+which status to report.
 
 ## The branch and the pull request
 
@@ -245,8 +248,9 @@ work package.
   performance-sensitive AGE path (reading or creating electrical/mechanical
   structures or elements), from your own before/after check, with no added
   performance test; otherwise `not-applicable` with the reason.
-- On a rework round, every finding in the rework note is fixed, or disputed
-  in `finding_responses` with the reason.
+- On a rework round, every finding in the rework note is fixed; a numbered
+  review finding you disagree with is disputed in `finding_responses`, and
+  anything else you leave is in `remaining_gaps`, each with the reason.
 - You actually ran the validation commands, not merely reasoned about them:
     - `mvn test` — unit tests
     - `mvn verify -DskipITs=false` — unit tests and integration tests.
@@ -265,4 +269,3 @@ work package.
   `unverified`.
 - No unresolved business assumptions remain.
 
-`phase`: `implementation`

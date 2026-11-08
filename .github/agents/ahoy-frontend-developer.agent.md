@@ -101,9 +101,10 @@ smallest diff on top of what is there. Removing code is often the fix.
   a `remaining_gaps` entry, not code.
 - **On rework, change before you add.** Before adding a branch for a review or
   CI finding, check whether changing your earlier code makes the finding
-  impossible; prefer that to another special case. A finding that asks for
-  handling the plan puts out of scope is answered `disputed` in
-  `finding_responses` with the reason.
+  impossible; prefer that to another special case. A numbered review finding
+  (`R1`, `R2`, ...) that asks for handling the plan puts out of scope is
+  answered `disputed` in `finding_responses` with the reason; any other
+  finding you leave goes in `remaining_gaps` with the reason.
 
 Example (R3DA-14689, backend, same rule): patching the effect of a bug grew to
 about 650 lines, 557 of them tests. Fixing the cause deleted 91 lines of
@@ -216,7 +217,8 @@ criterion asks for; otherwise add the test it needs.
 Never suppress a rule (`// NOSONAR`, an exclusion, a lowered threshold) to turn
 the gate green: that is the same class of move as deleting a failing test. If
 you believe an issue is genuinely a false positive, say why in
-`remaining_gaps`, report `unverified`, and let a person decide.
+`remaining_gaps` and let a person decide; the rework note says which status to
+report.
 
 ## The branch and the pull request
 
@@ -315,4 +317,3 @@ npm run playwright    # headless e2e, against the running app
   `unverified`.
 - No unresolved business assumptions remain in the changed scope.
 
-`phase`: `coding`
