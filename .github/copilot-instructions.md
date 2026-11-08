@@ -17,7 +17,7 @@ The Ahoy harness runs you for one phase of one story at a time, unattended. It o
 7. Every acceptance criterion must be verified by its named evidence; the reviewer and the harness's gates check this before delivery. Do not report work as done that you have not verified.
 8. Preserve the human approval gates for the plan and the delivery. Agents never approve or merge pull requests, and never push or open them: the harness does.
 9. No one answers questions during a run. When requested behavior, scope, ownership, or source facts are uncertain, do not assume:
-   - the planner writes its questions to `specs/<STORY-ID>/questions.json` and stops; a person answers, and planning runs again with the answers;
+   - the planner asks its questions as its prompt says (with the `ask_person` tool where the harness offers it, otherwise in `specs/<STORY-ID>/questions.json`) and stops; a person answers, and planning runs again with the answers;
    - every other agent reports the open question in its phase output (an implementer as `blocker_question` with status `blocked`, the reviewer as a `BLOCKED` report) and stops.
 10. Do not commit secrets, credentials, generated application artifacts, or local working copies.
 
