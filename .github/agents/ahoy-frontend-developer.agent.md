@@ -50,8 +50,11 @@ questions. This file covers only what is specific to implementation.
 4. When the story has a design and your run has the Playwright browser tools,
    follow the `ahoy-design-check` skill: start the app (`npm run start:keycloak`),
    open each frame's screen and state at the frame's size, measure what you built
-   and run the skill's comparison, fix every mismatch it prints, and report every
-   frame in `design_check`. **This check is required in every run**, before you
+   and run the skill's comparison, fix every mismatch it prints, leave the notes
+   it prints as they are (small differences that need no fix), and report every
+   frame in `design_check`. Where a frame also shows the application around
+   your screen, compare only your part with the skill's `--within`. **This
+   check is required in every run**, before you
    write the report: also when the branch holds earlier work, when you changed
    little or nothing, and when the UI already looks right to you. Looking at the
    frame images and the code is not the check; only the measured numbers are.
@@ -305,8 +308,8 @@ npm run playwright    # headless e2e, against the running app
   the `ahoy-design-check` skill (its `.measured.json` and screenshot are in
   `.ahoy/design-check/`) or unchecked with one of the reasons the skill lists
   and its evidence. Mismatches you
-  leave are listed with why; neither they nor unchecked frames make the status
-  `unverified`.
+  leave are listed with why, and the notes as the comparison printed them;
+  neither they nor unchecked frames make the status `unverified`.
 - Every text style maps to a Density typography row, using the tag Density
   provides. No hardcoded `font-size`, `line-height`, `font-weight` or
   `text-transform` for text the table covers.
