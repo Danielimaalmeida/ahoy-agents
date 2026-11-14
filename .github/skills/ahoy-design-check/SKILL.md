@@ -13,34 +13,45 @@ not yours to judge.
 The comparison prints what differs in two levels. A **mismatch** is what a person sees is off: you fix it. A **note**
 is a small difference, which needs no fix and no reason: a design and its build seldom match to the pixel.
 
-| What is compared                                        | Nothing   | Note      | Mismatch                      |
-| ------------------------------------------------------- | --------- | --------- | ----------------------------- |
-| Position and size (a box)                               | to 2 px   | to 8 px   | more than 8 px                |
-| Colour, of 255 a channel                                | the same  | to 8 (3%) | more: another colour          |
-| Font size                                               | to 0.5 px | to 1 px   | more than 1 px                |
-| Line height                                             | to 1 px   | to 2 px   | more than 2 px                |
-| Letter spacing                                          | to 0.5 px | to 2 px   | more than 2 px                |
-| Corner radius                                           | to 1 px   | to 4 px   | more than 4 px                |
-| Border width                                            | to 0.5 px | to 1 px   | more, or no border at all     |
-| Shadow (offsets, blur, spread)                          | to 1 px   | to 4 px   | more, or one more or one less |
-| Opacity                                                 | to 0.02   | to 0.1    | more than 0.1                 |
-| Font family, weight, case, decoration; a hidden element | the same  |           | any difference                |
-| A border, shadow or background the design has not       | none      |           | any, on a frame or rectangle  |
+| What is compared                                        | Nothing   | Note      | Mismatch                                             |
+| ------------------------------------------------------- | --------- | --------- | ---------------------------------------------------- |
+| Position and size (a box)                               | to 2 px   | to 8 px   | more than 8 px; a size, also more than 15% of itself |
+| Colour, of 255 a channel                                | the same  | to 8 (3%) | more: another colour                                 |
+| Font size                                               | to 0.5 px | to 1 px   | more than 1 px                                       |
+| Line height                                             | to 1 px   | to 2 px   | more than 2 px                                       |
+| Letter spacing                                          | to 0.5 px | to 2 px   | more than 2 px                                       |
+| Corner radius                                           | to 1 px   | to 4 px   | more than 4 px                                       |
+| Border width                                            | to 0.5 px | to 1 px   | more, or no border at all                            |
+| Shadow (offsets, blur, spread)                          | to 1 px   | to 4 px   | more, or one more or one less                        |
+| Opacity                                                 | to 0.02   | to 0.1    | more than 0.1                                        |
+| Font family, weight, case, decoration; a hidden element | the same  |           | any difference                                       |
+| A border, shadow or background the design has not       | none      |           | any, on a frame or rectangle                         |
+| Corners, border, shadow, opacity of a kit component     | as above  | any more  | never                                                |
+| A node of the design with no tagged element             |           |           | always, in one line                                  |
 
 How it reads the page:
 
-- **A box is judged by its surroundings.** A node that moved as its container did, or as one of the nodes just before
-  it in the same container, or that still reaches its container's far edge, is not listed again: one wider sidebar is
-  one line, not a line for everything beside it. A box line ends with what is off, such as `(y +12, width -20)`;
-  `box in 1:5` gives the boxes from the corner of node 1:5, `box` from the frame's corner.
-- **An auto-width text** is measured by its characters, and up to a tenth of its width is a note at most: the
-  browser's font is not Figma's.
+- **A box is judged by its surroundings.** A node is where its container, or one of the four nodes just before it in
+  that container, puts it: it kept its distance to the container's start (or to its end, when it is nearer that one),
+  its share of the container or its place in the middle, or it moved as the node before it did, or as that node's end
+  did. It is as large as designed, or it grew as its container did (it spans half of it or more and still reaches its
+  far edge, or it kept its share of it), or as a node of its size just before it did (the next row, the next card).
+  So one wider sidebar is one line, not a line for everything beside it and in it. A box line ends with what is off,
+  such as `(y +12, width -20)`; `box in 1:5` gives the boxes from the corner of node 1:5, `box` from the frame's
+  corner.
+- **A size is also judged by its share.** A width or height more than 15% off the design's is a mismatch however few
+  pixels that is (an icon of 25 px for 20), but for a text.
+- **An auto-width text** is measured by its characters, and up to 10% of its width is a note at most: the browser's
+  font is not Figma's.
 - **A font family** is the design's when CSS writes it as a font file does (`Acme Sans` as `AcmeSans-Medium`), or as
   the system's font (`-apple-system`, `system-ui`) where the design names one (SF Pro, Segoe UI).
-- **A component instance** is the design kit's: only what the instance itself states (its box, a fill, a border) is
-  compared, not the corners, borders or shadows the kit draws inside it. Build it with the kit's component and
-  variant; never restyle a kit component to make a line go away.
+- **A component** (an instance) is the design kit's. The corners, border, shadow and opacity it states are the kit's
+  to draw: a difference there is a note at most, and where it states none, nothing is compared. Its box and its fill
+  are compared as any node's. Build it with the kit's component and variant; never restyle a kit component to make a
+  line go away.
 - **A fully transparent fill** of the design is no fill.
+- **What you did not tag is a mismatch.** Every node of the design with a text, a component or a colour that has no
+  tagged element is named in one line, `frame 1:2 not measured: ...`: a frame half measured does not match.
 
 ## This check is required
 
@@ -89,19 +100,22 @@ find in the environment. If the app does not start, report every frame `unchecke
    `filename` set to `.ahoy/design-check/<frame file>.measured.json` (the frame's file name, `12-34` for `12:34`).
 5. Compare:
    `node .github/skills/ahoy-design-check/compare.mjs .ahoy/specs/<KEY>/design/frames/<frame file>.json .ahoy/design-check/<frame file>.measured.json`
-   It prints the mismatches, one line each
+   It prints a summary first (`frame 12:34 "Orders": 14 node(s) measured; 2 mismatch(es) to fix; 3 note(s)`), then
+   the mismatches, one line each
    (`1:4 "Submit" box: design [16, 200, 120, 40], built [16, 212, 100, 36] (y +12, width -20)`), then the notes (at
-   most 20, the rest counted), then the nodes it could not compare because you tagged none. It exits 0 when no
-   mismatch is left, with or without notes.
+   most 20, the rest counted). It exits 0 when no mismatch is left, with or without notes, and 1 with mismatches.
+   Exit 2 is not a result: it could not read an input, such as a measurement that measure.js did not write. Measure
+   again.
 
    When the frame also shows what your package does not build (the application around the screen: its header, its
    navigation), compare only your part: add `--within <node id>` with the node that holds it, once per node. That
-   node must be tagged. Its own position is then not compared, only its size and what is in it, and the first note
-   says what was left out.
+   node must be tagged. It only says where your part is: its own box and look are not compared, what is in it is,
+   from its corner. The summary then says `only within` that node and how many of the frame's nodes are outside it,
+   which the reviewer reads: leave outside only what your package does not build.
 
 6. Fix the code (the design kit's components, variants and tokens first), reload, and repeat 3 to 5 until it prints no
    mismatch, or every one left is explained by the plan or an acceptance criterion. Leave the notes as they are: do
-   not spend the run on them. Tag the nodes it says are not measured, so that the check covers the frame.
+   not spend the run on them. Tag the nodes the `not measured` line names, so that the check covers the frame.
 7. `browser_take_screenshot` with `filename` `.ahoy/design-check/<frame file>.png`.
 
 Frames under one page that only document the design (a cover, notes) are not screens: report them `unchecked` with
@@ -117,6 +131,7 @@ Add `design_check` to your handoff report, one entry per frame of index.json:
     "frame": "12:34",
     "screen": "/invoices, three invoices, filter open",
     "status": "checked",
+    "summary": "<the first line compare.mjs prints>",
     "mismatches": ["<each mismatch line compare.mjs still prints>"],
     "notes": ["<each note line it prints>"],
     "reason": "<why a mismatch stays, or why the frame is unchecked>"
