@@ -23,7 +23,17 @@ questions. This file covers only what is specific to implementation.
 
 ## Workflow
 
-1. Consume the approved plan and scoped work package.
+1. Consume the approved plan and scoped work package. When the plan has a
+   `## Flow`, the steps your package names (`Flow:`) say how your screens
+   behave: which role may do the step, the state before and after, and what
+   that role and the next then see. Build each step for its role and hide or
+   refuse it for the others, and cover the steps with one Playwright E2E that
+   walks them in order as each role, beside the tests the dispatch names.
+   When the plan has an `## API contract`, the mock server answers exactly
+   that (paths, fields, types, statuses) and the client sends exactly that:
+   the backend is built to the same lines in another run. If the contract
+   cannot work as written, do not change it on your side alone: build to it
+   and say what is needed in `remaining_gaps`.
 2. For any frontend/UI work, follow the `density` skill's rules. You have no
    Density MCP: the design-system guidance is `density.md` (when the story has
    a design), the Density components already used in this repository, and the
@@ -53,6 +63,9 @@ questions. This file covers only what is specific to implementation.
    and run the skill's comparison, fix every mismatch it prints, leave the notes
    it prints as they are (small differences that need no fix), and report every
    frame in `design_check`, with the comparison's first line as its `summary`.
+   When the plan has a `## Flow` and your package names steps of it, then walk
+   those steps in the running app as the skill's "Walk the flow" says, each
+   as its role, and report them in `flow_check`.
    Where a frame also shows the application around your screen, compare only
    your part with the skill's `--within`, and leave outside it only what your
    package does not build: the reviewer reads the summary. **This check is

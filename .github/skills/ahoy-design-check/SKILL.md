@@ -1,6 +1,6 @@
 ---
 name: ahoy-design-check
-description: Check a built UI against the story's Figma frames with the Playwright browser tools, measure every tagged element, fix the mismatches, note the small differences and report each frame in design_check. Use when the run has a design (specs/<KEY>/design/index.json) and the Playwright MCP tools.
+description: Check a built UI against the story's Figma frames with the Playwright browser tools, measure every tagged element, fix the mismatches, note the small differences and report each frame in design_check; then walk the steps of the plan's Flow as each role and report them in flow_check. Use when the run has a design (specs/<KEY>/design/index.json) and the Playwright MCP tools.
 ---
 
 # Ahoy design check
@@ -121,7 +121,36 @@ find in the environment. If the app does not start, report every frame `unchecke
 Frames under one page that only document the design (a cover, notes) are not screens: report them `unchecked` with
 that reason.
 
-## 3. Report
+## 3. Walk the flow
+
+Only when the plan (`.ahoy/specs/<KEY>/implementation-plan.md`) has a `## Flow` section and your work package names
+steps of it (`- Flow: F1, F4`). The frames say how each screen looks; the flow says what happens between them, and a
+screen that matches its frame can still leave the next person with nothing to act on. Once the frames match, walk
+your steps in the running app, in the map's order:
+
+1. Be the step's role: log in as the mock user that has it, as the repository's mocks give roles (a user per role, a
+   role in the mocked session). Where the mocks know one user only, add the role's user to them: the test that walks
+   the flow needs it too. When the role changes, log out first, or `browser_close` and open the app again.
+2. Bring what the step acts on to the step's state before (`pending` for `pending → approved`): by doing the steps
+   before it in the app where your package builds them, else with the mocks' data.
+3. Do the step as a person does, with `browser_click`, `browser_type` and `browser_select_option`, never by calling
+   the API from the page.
+4. Read what the app then shows with `browser_snapshot`: the state after, and what this role now sees and may do.
+   Then, as the next role the map's `Then` names, open its screen and read what it sees.
+5. `browser_take_screenshot` with `filename` `.ahoy/design-check/flow-<step id>.png` (`flow-F1.png`), of the screen
+   after the step.
+6. Where the app does something else than the map says, fix the code and walk the step again, until it does or the
+   plan or a criterion explains the difference.
+
+The mocks answer as the plan's `## API contract` says, where it has one: the same paths, fields and statuses. With
+mocked data, what the next role finds is what the mocks hold: say in `saw` whether it was there because you did the
+step (the mock keeps state) or because the mocks' data has it.
+
+A step may stay `unwalked` only for one of these reasons, written in its `reason`: the browser tools are missing; the
+app did not start; its role or its state before cannot be reached with the repository's mocks (say what you tried).
+A step whose screen another package builds is not yours to walk: leave it out.
+
+## 4. Report
 
 Add `design_check` to your handoff report, one entry per frame of index.json:
 
@@ -143,3 +172,23 @@ Add `design_check` to your handoff report, one entry per frame of index.json:
 left without a reason the plan or a criterion gives is a finding the reviewer sends back; a note is not. When you
 compared `--within` a node, say in the `reason` which part of the frame is not your package's. Every `checked` frame
 has its `.ahoy/design-check/<frame file>.measured.json` and screenshot; a frame without them is not checked.
+
+When you walked the flow, add `flow_check` beside it, one entry per step your package names:
+
+```json
+"flow_check": [
+  {
+    "step": "F1",
+    "role": "requester",
+    "did": "/discounts/7: filled the form and pressed Send for approval",
+    "status": "walked",
+    "saw": "the form read-only with the tag Pending; as approver, /approvals lists discount 7 (the mock kept it)",
+    "reason": "<why it still differs, or was not walked>"
+  }
+]
+```
+
+`status` is `walked` when the app did what the map says, `differs` when it does something else that you left (`saw`
+says what, `reason` why), and `unwalked` when you did not do the step. A step that differs or was not walked is not a
+reason for `unverified`; one left without a reason the plan or a criterion gives is a finding the reviewer sends
+back.
