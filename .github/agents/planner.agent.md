@@ -155,15 +155,16 @@ implied is built as screens that each pass their test and do not add up.
 
 The map is at most 12 steps. A longer one is usually two stories, or lists what changes no state and no role.
 
-### The contract between packages
+### The contract between a flow's packages
 
-When one package calls what another builds or changes (a frontend its backend, a service another's endpoint), state
-the contract once, in `## API contract`, so that neither side waits for the other or guesses: one line per endpoint
-with the method and path, the role that may call it, the request and response fields with their types, and each error
-the caller handles (the status, and when). Take the paths, the casing and the error shape from the repository's
-existing endpoints. The calling package mocks exactly this and the providing package implements exactly this: name
-`API contract` in the `Constraint` of both. An endpoint that exists and does not change is not listed. A story whose
-packages meet at no endpoint has no such section, and names `API contract` on the `None:` line.
+In a story with a flow, when one package calls what another builds or changes (a frontend its backend, a service
+another's endpoint), state the contract once, in `## API contract`, so that neither side waits for the other or
+guesses: one line per endpoint with the method and path, the role that may call it, the request and response fields
+with their types, and each error the caller handles (the status, and when). Take the paths, the casing and the error
+shape from the repository's existing endpoints. The calling package mocks exactly this and the providing package
+implements exactly this: name `API contract` in the `Constraint` of both. An endpoint that exists and does not change
+is not listed. A story with no flow, or whose packages meet at no endpoint, has no such section, and names
+`API contract` on the `None:` line.
 
 Create exactly one prose artifact at `specs/<STORY-ID>/implementation-plan.md`.
 
@@ -531,7 +532,7 @@ your output against what the gate requires instead:
   removes.
 - A story in which more than one role acts, or what they act on changes
   state, has `## Flow`: every criterion of the flow is in a step, and no
-  state or view is a guess. Packages that meet at an endpoint have
+  state or view is a guess. Its packages that meet at an endpoint have
   `## API contract`, named in the `Constraint` of both. (No gate checks
   this; plan review flags criteria that read as a flow in a plan without
   `## Flow`.)

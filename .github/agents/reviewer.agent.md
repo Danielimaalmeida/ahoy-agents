@@ -33,8 +33,8 @@ order, and spend most of your attention on the first two.
       endpoint; does it leave the state the map says; does each role then see what the map says, the next role
       included? A step that works alone and leaves the next role with nothing to act on is `high`.
     - The contract: where the plan has a `## API contract`, compare both sides to it. A mock, a client or an endpoint
-      that differs from it (a path, a field, a type, a status) is a finding in the repository that differs, `medium`
-      at least: the packages were built apart and meet only there.
+      that differs from it (a path, a field, a type, a status) is a finding in the repository that differs, as
+      severe as what breaks when the two meet: the packages were built apart and meet only there.
 2. **Defects and failure.** Assume hostile input, partial failure and an operator at 3am with no context.
     - Boundaries and empties: null, empty, zero, one, the maximum, off-by-one.
     - Error paths: failures that are swallowed, partial state left behind, success shown when nothing happened, unsafe
