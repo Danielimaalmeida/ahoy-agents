@@ -128,6 +128,44 @@ When the story involves designs, record the applicable Figma references — file
 - Where the design and the acceptance criteria disagree, or the UI shows data no repository provides, ask a question with a recommendation instead of choosing silently. The criteria win unless a person says otherwise; a difference that stays goes in the plan as a design decision.
 - No `design/` means the story links no Figma frame or it could not be read: plan from the links in `jira-source.md` as before, and do not ask for the design.
 
+### A story with a flow
+
+A story has a flow when more than one role acts in it (a requester sends, an approver decides), or when what people
+act on changes state as they do (draft, pending, approved, rejected). Most stories have none: one screen, one
+endpoint, a fix. For those, write no `## Flow` section and name `flow` on the plan's `None:` line.
+
+For a story with a flow, the plan maps it in `## Flow`. Nothing else in a plan says how the story behaves from one
+person to the next: each criterion is tested alone and each repository builds its own half, so a flow that is only
+implied is built as screens that each pass their test and do not add up.
+
+- **Roles.** Who acts, and what each may do and see. Use the story's names and the roles the code already has.
+- **States.** The states of what they act on, and which step leads from one to the next.
+- **Steps.** One row for each thing a person does that changes a state or hands the work to another role, in the
+  order it happens: the role, what it does, the screen (with its frame, when the design has one), the state before
+  and after, what that role and the next then see, and the criteria the step proves. The ways back are steps too: a
+  rejection, a withdrawal, sending it again.
+- **What the story does not say is a question, never a guess.** A state no frame shows (rejected, empty, an error),
+  a step the criteria imply and no screen has, what one role sees of another's work, who may undo a step: ask, with
+  your recommendation, the codebase's existing pattern first. An answered question becomes a row that cites `(Qn)`.
+- **Every step has a criterion or a decision behind it, and every criterion of the flow is in a step.** A step with
+  neither is behaviour nobody asked for: leave it out, or ask.
+- **One test walks it.** Where one package builds the screens of several steps, plan one test that walks them in
+  order as each role, and list it under the criteria of those steps: a test per step proves each screen, not the
+  flow.
+
+The map is at most 12 steps. A longer one is usually two stories, or lists what changes no state and no role.
+
+### The contract between a flow's packages
+
+In a story with a flow, when one package calls what another builds or changes (a frontend its backend, a service
+another's endpoint), state the contract once, in `## API contract`, so that neither side waits for the other or
+guesses: one line per endpoint with the method and path, the role that may call it, the request and response fields
+with their types, and each error the caller handles (the status, and when). Take the paths, the casing and the error
+shape from the repository's existing endpoints. The calling package mocks exactly this and the providing package
+implements exactly this: name `API contract` in the `Constraint` of both. An endpoint that exists and does not change
+is not listed. A story with no flow, or whose packages meet at no endpoint, has no such section, and names
+`API contract` on the `None:` line.
+
 Create exactly one prose artifact at `specs/<STORY-ID>/implementation-plan.md`.
 
 ### Writing the plan
@@ -138,12 +176,12 @@ package. The reviewer reads the decisions and the evidence for each criterion.
 Write for them, in that order.
 
 **Length limits.** The plan is at most 60 lines, not counting the criteria
-table; a story with more than two repositories may add 15 lines for each
-further repository. Within that:
+table, the flow's steps and the API contract; a story with more than two
+repositories may add 15 lines for each further repository. Within that:
 
 - Summary: at most 4 lines.
 - Design decisions: at most 5.
-- Each work package: at most 4 bullets.
+- Each work package: at most 5 bullets.
 - Risks: at most 3.
 
 If the plan does not fit, cut repetition and investigation first. Never drop a
@@ -215,9 +253,19 @@ outside the delivery), by id.
 - Out of scope: … — <reason>, citing `(Qn)` where a person decided it.
 - Assumptions: …
 
+## Flow
+Roles: <role>: <what it may do and see>; <role>: …
+States of <what they act on>: <state> → <state> → <state> or <state>.
+| Step | Role | Does | Screen (frame) | State | Then | AC |
+|------|------|------|----------------|-------|------|----|
+| F1 | <role> | <what the person does> | <screen> (`<node>`) | <before> → <after> | <what this role and the next then see> | AC1 |
+
 ## Design decisions
 **D1 — <the decision, in one line>.** Because <today's fact, if any>, <why>.
 Rejected: <alternative> — <reason, one clause>.
+
+## API contract
+- `<METHOD> <path>` (<role>): `{ <request field>: <type> }`; 200 `{ <field>: <type> }`; <status> when <case>.
 
 ## Work packages
 ### <repo alias> — branch `<prefix>/<STORY-ID>-<branch_slug>`
@@ -226,6 +274,7 @@ Rejected: <alternative> — <reason, one clause>.
 - Touches: <at most 5 files or components>
 - Constraint: <what the code cannot tell the implementer: decision ids, conventions, what not to touch>
 - Design (frontend only): <Figma file, node, what it covers>
+- Flow (a story with one): <the steps this package builds, by id>
 
 ## Acceptance criteria and evidence
 | AC | Criterion | WP | Evidence (`test_ids`) |
@@ -292,8 +341,34 @@ value the page can compute.
 ## Risks
 - R1 — `dueDate` is in UTC and the page shows local time → AC2's test uses an invoice due at midnight UTC.
 
-None: assumptions, actions outside this delivery.
+None: flow, API contract, assumptions, actions outside this delivery.
 ```
+
+A story with a flow adds the two sections. These are from another invented story, in which a requester sends a
+discount for approval:
+
+```markdown
+## Flow
+Roles: requester: creates a discount and sends it, sees only its own; approver: sees every pending discount, decides.
+States of a discount: draft → pending → approved or rejected; rejected → pending when sent again.
+| Step | Role      | Does                     | Screen (frame)            | State              | Then                                                           | AC  |
+|------|-----------|--------------------------|---------------------------|--------------------|----------------------------------------------------------------|-----|
+| F1   | requester | sends a draft            | Discount form (`88:120`)  | draft → pending    | requester: read-only, "Pending"; approver: in its queue        | AC1 |
+| F2   | approver  | approves it              | Approval queue (`88:340`) | pending → approved | approver: it leaves the queue; requester: "Approved"           | AC2 |
+| F3   | approver  | rejects it with a reason | Approval queue (`88:340`) | pending → rejected | requester: "Rejected" with the reason, and may edit it `(Q3)`  | AC3 |
+| F4   | requester | edits it and sends again | Discount form (`88:120`)  | rejected → pending | as F1                                                          | AC3 |
+
+## API contract
+- `POST /discounts/{id}/submit` (requester, its own): no body; 200 `{ id: string, status: "pending" }`; 409 when it is
+  not `draft` or `rejected`.
+- `POST /discounts/{id}/decision` (approver): `{ approve: boolean, reason?: string }`; 200
+  `{ id: string, status: "approved" | "rejected", reason: string | null }`; 400 when it rejects without `reason`;
+  409 when it is not `pending`.
+- `GET /discounts?status=pending` (approver): 200 `{ items: { id: string, requester: string, amount: number }[] }`.
+```
+
+Its work packages then name their steps, `- Flow: F1, F4` for the form's and `- Flow: F1 to F4` for the backend's,
+and both name `API contract` in their `Constraint`.
 
 **The plan describes the current design and nothing else.** No "the prior
 revision claimed", no "reversed per this round's feedback", no correction
@@ -455,6 +530,12 @@ your output against what the gate requires instead:
   this; the people who read the plan do).
 - For a fix, a design decision names the cause and the code the change
   removes.
+- A story in which more than one role acts, or what they act on changes
+  state, has `## Flow`: every criterion of the flow is in a step, and no
+  state or view is a guess. Its packages that meet at an endpoint have
+  `## API contract`, named in the `Constraint` of both. (No gate checks
+  this; plan review flags criteria that read as a flow in a plan without
+  `## Flow`.)
 - No criterion or test exists only to cover one item of the ticket's test
   notes; scenarios that differ only by input share a test.
 - Every criterion has `id`, `text`, `repo` and at least one `test_ids` entry;

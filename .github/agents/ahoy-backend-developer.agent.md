@@ -101,6 +101,15 @@ apply; they are the part that matters.
 1. Read the assigned work package, its acceptance criteria, the repository
    instructions, `.github/skills/testing-patterns/SKILL.md`, and any other
    relevant skill before editing anything.
+   When the plan has a `## Flow`, the steps your package names (`Flow:`) say
+   how your endpoints behave: which role may do the step, the state it needs
+   and the state it leaves, and what each role may then read. Enforce the
+   role and the state at the endpoint, not only in the UI's absence of a
+   button, with an IT test that walks the steps in order as each role. When
+   the plan has an `## API contract`, implement exactly that (paths, fields,
+   types, statuses): the frontend mocks the same lines in another run. If
+   the contract cannot work as written, do not change it on your side alone:
+   build to it and say what is needed in `remaining_gaps`.
 2. **On a rework round** the dispatch carries a rework note: the reviewer's
    findings or the failing checks that sent the package back. Read it first.
    Fix exactly what it lists, nothing broader; a finding that is a defect gets a

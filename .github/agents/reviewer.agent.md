@@ -28,6 +28,13 @@ order, and spend most of your attention on the first two.
 
 1. **The criteria.** For each acceptance criterion: does the change do what it says, and does the named evidence
    prove it for the right reason? What input would break it?
+    - The flow: where the plan has a `## Flow`, the criteria can each pass while the flow does not. Follow every step
+      through the code as its role: is it open to that role and closed to the others, on the screen and at the
+      endpoint; does it leave the state the map says; does each role then see what the map says, the next role
+      included? A step that works alone and leaves the next role with nothing to act on is `high`.
+    - The contract: where the plan has a `## API contract`, compare both sides to it. A mock, a client or an endpoint
+      that differs from it (a path, a field, a type, a status) is a finding in the repository that differs, as
+      severe as what breaks when the two meet: the packages were built apart and meet only there.
 2. **Defects and failure.** Assume hostile input, partial failure and an operator at 3am with no context.
     - Boundaries and empties: null, empty, zero, one, the maximum, off-by-one.
     - Error paths: failures that are swallowed, partial state left behind, success shown when nothing happened, unsafe
