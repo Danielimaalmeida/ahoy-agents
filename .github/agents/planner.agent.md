@@ -125,7 +125,7 @@ When the story involves designs, record the applicable Figma references — file
 
 - Size and split the UI work from what the frames contain: the screens and states, the components, which of them the repository already has.
 - Pin to each UI work package the frames (file and node) it builds, so no frame is left to nobody and none is built twice.
-- Where the design and the acceptance criteria disagree, or the UI shows data no repository provides, ask a question with a recommendation instead of choosing silently. The criteria win unless a person says otherwise; a difference that stays goes in the plan as a design decision.
+- Where the design and the acceptance criteria disagree, or the UI shows data no repository provides, ask a question with a recommendation instead of choosing silently. The criteria win unless a person says otherwise; a difference that stays goes in the plan as a decision.
 - No `design/` means the story links no Figma frame or it could not be read: plan from the links in `jira-source.md` as before, and do not ask for the design.
 
 ### A story with a flow
@@ -178,14 +178,15 @@ has two parts, divided by a rule (`---`): what a person reads to approve, and
 below it what the implementers and the reviewer need on top of that. Write for
 them, in that order.
 
-**Length limits.** The part above the rule is at most 70 lines, not counting
-the flow's steps, the API contract and the criteria table; a story with more
-than two repositories may add 15 lines for each further repository. Within
-that:
+**Length limits.** The part above the rule is at most 70 lines of text (empty
+lines do not count), not counting the flow's steps, the API contract and the
+criteria table; a story with more than two repositories may add 15 lines for
+each further repository. Within that:
 
 - In short: at most 4 lines, and at most 4 checks.
 - Today and after: at most 8 lines.
-- What changes: at most 12 lines for each work package.
+- What changes: at most 12 lines for each repository, shared by its work
+  packages.
 - Decisions: at most 5, each of at most 4 lines.
 - Risks: at most 3.
 
@@ -194,34 +195,40 @@ criterion, a decision a person made, or a design reference to fit. The usual
 cause of a long plan is that it says things twice.
 
 - **The top decides.** `In short` says what changes for the people who use it,
-  in plain words, and in which repositories. Under it, `Before you approve,
-  check` says in full each thing the approver must notice: a behaviour that
-  changes, a decision to confirm, a breaking change, an order of release. A
-  bare id (`check D4`) sends the reader looking: write what D4 means for them
-  in one line, and cite the id at its end.
+  in plain words, and in which repositories. Under it,
+  `Before you approve, check` says in full each thing the approver must
+  notice: a behaviour that changes, a decision to confirm, a breaking change,
+  an order of release. A bare id (`check D4`) sends the reader looking: write
+  what D4 means for them in one line, and cite the id at its end.
 - **Show the shape before the detail.** `What changes` is a tree, one block
   for each work package: the files or components the package adds (`+`),
   changes (`~`) and removes (`-`), and what it reuses as it is where a reader
   would expect new code (`=`), each with what happens to it in at most ten
-  words and the ids it serves. It lets a person see the size of the change,
-  what is new, what goes and what is duplicated, without reading a sentence.
-  Group files by folder where more than 12 lines would be needed
-  (`+ features/requests/   routes, list, review page`). Tests are in the tree
-  only when existing ones change or go. Write only what you read in the code:
-  where you do not know a name, say what the thing is (`+ a request entity`)
-  and never invent a path. The tree is the plan's forecast, not a list of
-  steps: the implementer finds the code by driving it from the test.
-- **For a fix, show one case today and after.** When the story corrects or
-  changes how something existing behaves, `Today and after` shows the same
-  small case twice, side by side: a tree, two rows, a request and its answer.
-  Take the ticket's own example where it has one. A reader sees in it what
-  the summary takes a paragraph to say.
+  words, and the ids it serves where it serves one. It lets a person see the
+  size of the change, what is new, what goes and what is duplicated, without
+  reading a sentence. Group files by folder where a repository would need
+  more than 12 lines (`+ features/requests/   routes, list, review page`). A
+  test file is in the tree when it is new or goes, or when its tests must
+  change because the behaviour they pin changes; one that only gains the new
+  tests is not, and no test is named there. A `~`, `-` or `=` line names what
+  you read in the code, by its name there. A `+` line names what will exist,
+  where the repository's layout puts such a thing; where you cannot tell, say
+  what the thing is (`+ a request entity`) and invent no path. The tree is
+  the plan's forecast, not a list of steps: the implementer finds the code by
+  driving it from the test.
+- **For a fix, show one case today and after.** When the story corrects
+  existing behaviour, `Today and after` shows the same small case twice, side
+  by side: a tree, two rows, a request and its answer. Take the ticket's own
+  example where it has one. A reader sees in it what the summary takes a
+  paragraph to say. A story that is not a fix has no such section, and does
+  not name it on the `None:` line.
 - **Say each fact once.** Every fact has one place in the outline below.
   Anywhere else, refer to it by its id (`D2`, `AC3`, `WP1`, `R1`, `Q2`)
-  instead of repeating it. The checks under `In short` are the one exception:
-  they say in a line what their id says in full. A known gap or an
-  out-of-scope item goes under `Not in this delivery`, and a risk goes under
-  Risks.
+  instead of repeating it. Two things are not repetition: the checks under
+  `In short` say in a line what their id says in full, and the tree may name
+  a file a decision names, since the tree says what happens to it and the
+  decision why. A known gap or an out-of-scope item goes under
+  `Not in this delivery`, and a risk goes under Risks.
 - **Use bullets, tables and trees, not paragraphs.** One idea per bullet, in
   one or two short sentences. No paragraph runs past four lines. Leave an
   empty line between two decisions: Markdown joins lines that follow each
@@ -255,7 +262,7 @@ cause of a long plan is that it says things twice.
   the whole file is parsed, so its children land on the nearest valid parent;
   attach it while parsing, where its parent is already known, and delete the
   post-parse linking step." Rejected: correcting the post-parse step. What it
-  removes is a `-` line of `What changes`.
+  removes is also a `-` line of `What changes`.
 - **Test notes are scenarios, not criteria.** A ticket's test notes, QA notes
   or test checklist say what the evidence should exercise. Derive criteria
   from the behaviour the story asks for; the listed scenarios go into those
@@ -332,7 +339,7 @@ States of <what they act on>: <state> → <state> → <state> or <state>.
 ## Actions outside this delivery
 - <manual step that no work package covers> — <who has to do it>
 
-None: <the sections above, and `assumptions`, that have nothing in them>.
+None: <the sections above, and `assumptions`, that have nothing in them; never `today and after`>.
 
 ---
 
@@ -358,8 +365,9 @@ does (`the migration itself`). The one below the rule lists every
 `` `build-and-push` (native_validation) ``. Leave the
 `verification_rationale` out: it stays in `state.json`, and the implementer
 receives it from there. Every verification anchor must appear in that table:
-the person approving the plan approves these seams along with the plan, and
-the implementers build test-first against them, so they have to see them.
+the anchors are part of the plan a person approves, and the implementers
+build test-first against them, so both must find them there. A plan with one
+work package leaves the WP column out of the table above the rule.
 
 This is what a plan looks like. Its story, repository, agent and Figma names
 are invented: take yours from the story, `agent-mappings.md` and the sources
@@ -380,7 +388,7 @@ One repository, `billing-web`, one work package; no API change.
 billing-web    branch feature/PROJ-123-invoice-due-date    WP1, billing-web-implementer
   ~ src/billing/InvoiceRow.tsx     shows the due date and the overdue marker (AC1, AC2)
   ~ src/billing/InvoiceList.tsx    gives each row today's date; none for a paid invoice (AC3)
-  = formatDate                     formats the due date, as every other date on the page
+  = formatDate                     formats the due date, like the page's other dates
 ```
 
 ## Decisions
@@ -395,23 +403,23 @@ billing-web    branch feature/PROJ-123-invoice-due-date    WP1, billing-web-impl
 - Due-date reminder emails — a separate story `(Q2)`.
 
 ## Acceptance criteria
-| AC  | Criterion                               | WP  | Tests |
-|-----|-----------------------------------------|-----|-------|
-| AC1 | An open invoice shows its due date      | WP1 | 1     |
-| AC2 | An invoice past its due date is overdue | WP1 | 1     |
-| AC3 | A paid invoice shows no due date        | WP1 | 1     |
+| AC  | Criterion                               | Tests |
+|-----|-----------------------------------------|-------|
+| AC1 | An open invoice shows its due date      | 1     |
+| AC2 | An invoice past its due date is overdue | 1     |
+| AC3 | A paid invoice shows no due date        | 1     |
 
 ## Risks
 - R1 — `dueDate` is in UTC and the page shows local time → AC2's test uses an invoice due at midnight UTC.
 
-None: today and after, flow, API contract, assumptions, actions outside this delivery.
+None: flow, API contract, assumptions, actions outside this delivery.
 
 ---
 
 ## For the implementer and the reviewer
 **WP1 — billing-web-implementer**
 - Tests drive: `InvoiceList`, rendered with test invoices and a fixed today's date.
-- Constraint: dates go through the existing `formatDate` helper; the overdue colour comes from the design tokens.
+- Constraint: the overdue colour comes from the design tokens.
 - Design: Figma `Billing`, node `412:88`, the invoice row with its due date and overdue state.
 
 | AC  | Tests (`test_ids`)                            |
@@ -467,8 +475,8 @@ revision claimed", no "reversed per this round's feedback", no correction
 notes about what an earlier draft got wrong. That history lives in
 `decision_log`, where each revision round and its reason are already
 recorded; a plan that narrates its own rewrites is read seven times over by
-implementers and reviewers who need none of it. A design decision states the
-decision, the reason, and the alternatives rejected — not when the reasoning
+implementers and reviewers who need none of it. A decision states what was
+decided, the reason, and the alternatives rejected — not when the reasoning
 changed.
 
 Keep unresolved assumptions explicit. Only after repository-context inspection and clarification are complete may you produce the implementation plan. Do not execute implementation, modify child repositories, or update Jira.
@@ -622,10 +630,11 @@ your output against what the gate requires instead:
   this; the people who read the plan do).
 - For a fix, a decision names the cause and the code the change removes,
   and `Today and after` shows one case.
-- `What changes` names only files and components you read in the code, and
-  the decisions have an empty line between them.
-- Above the rule there is no word of the harness, and each check under
-  `In short` says in full what the approver must notice.
+- `What changes` gives what exists its name in the code and invents no path
+  for what does not; the decisions have an empty line between them.
+- Above the rule none of `seam`, `verification mode`, `native_validation`,
+  `provenance` and `readiness` appears, and each check under `In short` says
+  in full what the approver must notice.
 - A story in which more than one role acts, or what they act on changes
   state, has `## Flow`: every criterion of the flow is in a step, and no
   state or view is a guess. Its packages that meet at an endpoint have
@@ -711,7 +720,9 @@ rewrite makes the human re-read everything to find your one change. Edit the
 plan in place so it describes the new design as if it had always been the
 design; the round history is already in `decision_log`. The length limits in
 "Writing the plan" still apply: a revision replaces text, it does not add to
-it. Update `plan-sources.md` with anything new you inspected.
+it. A plan written in an earlier outline keeps that outline through its
+revisions: moving it to the outline above is the rewrite this section
+forbids. Update `plan-sources.md` with anything new you inspected.
 
 If what they asked for is ambiguous, ask before editing, through
 `questions.json`.

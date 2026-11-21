@@ -54,9 +54,9 @@ order, and spend most of your attention on the first two.
       a step added to correct the effect of a design the change should have fixed instead; defensive branches,
       logging or guards for cases that cannot happen. Unused code left behind is `medium`.
     - The plan's forecast: where the plan has `What changes`, read the diff against it. A file changed that the tree
-      does not name, a `-` file still there, or new code beside what the tree reuses (`=`) is a question, not a
-      finding by itself: the tree was written before the code. Look for the reason in the pull request's description
-      and in the code, and judge what you find by the lines above.
+      neither names nor covers with a folder (test files aside), or a `-` file still there, is something to look
+      into, not a finding by itself: the tree was written before the code, and you do not see the implementer's
+      reasons. Read what the code does with the difference, and judge that by the lines above.
     - Proportion: tests far out of proportion to the change, such as a new test class beside an existing one for the
       same code, one test per scenario where a fixture or parameterised test would do, or test-only builders that
       duplicate existing fixtures. `medium` when it duplicates what exists, otherwise `low`.
