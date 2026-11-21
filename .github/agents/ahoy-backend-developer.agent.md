@@ -101,6 +101,12 @@ apply; they are the part that matters.
 1. Read the assigned work package, its acceptance criteria, the repository
    instructions, `.github/skills/testing-patterns/SKILL.md`, and any other
    relevant skill before editing anything.
+   Your package's part of the plan is its block of `What changes` and its
+   lines under `For the implementer and the reviewer`. The block is the
+   plan's forecast of what you add (`+`), change (`~`), remove (`-`) and
+   reuse as it is (`=`), written before the code: start from it, and where
+   the criteria need another file, or a `-` cannot go, do what they need and
+   say which and why in `pr_body`.
    When the plan has a `## Flow`, the steps your package names (`Flow:`) say
    how your endpoints behave: which role may do the step, the state it needs
    and the state it leaves, and what each role may then read. Enforce the

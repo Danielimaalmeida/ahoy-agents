@@ -23,7 +23,14 @@ questions. This file covers only what is specific to implementation.
 
 ## Workflow
 
-1. Consume the approved plan and scoped work package. When the plan has a
+1. Consume the approved plan and scoped work package.
+   Your package's part of the plan is its block of `What changes` and its
+   lines under `For the implementer and the reviewer`. The block is the
+   plan's forecast of what you add (`+`), change (`~`), remove (`-`) and
+   reuse as it is (`=`), written before the code: start from it, and where
+   the criteria need another file, or a `-` cannot go, do what they need and
+   say which and why in `pr_body`.
+   When the plan has a
    `## Flow`, the steps your package names (`Flow:`) say how your screens
    behave: which role may do the step, the state before and after, and what
    that role and the next then see. Build each step for its role and hide or
