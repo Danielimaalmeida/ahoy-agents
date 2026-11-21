@@ -23,9 +23,17 @@ questions. This file covers only what is specific to implementation.
 
 ## Workflow
 
-1. Consume the approved plan and scoped work package. When the plan has a
-   `## Flow`, the steps your package names (`Flow:`) say how your screens
-   behave: which role may do the step, the state before and after, and what
+1. Consume the approved plan and scoped work package.
+   When the plan has a `What changes` tree, your package's part of the plan
+   is its block of that tree and its lines under
+   `For the implementer and the reviewer`. The block is the plan's forecast
+   of what you add (`+`), change (`~`), remove (`-`) and reuse as it is
+   (`=`), written before the code: start from it. It is not a limit: where
+   the criteria need other code than it names, or a `-` cannot go, do what
+   they need, and when you write `pr_body` say there which and why, for the
+   people who approved the plan.
+   When the plan has a `## Flow`, the steps your package names (`Flow:`) say
+   how your screens behave: which role may do the step, the state before and after, and what
    that role and the next then see. Build each step for its role and hide or
    refuse it for the others, and cover the steps with one Playwright E2E that
    walks them in order as each role, beside the tests the dispatch names.
@@ -103,7 +111,7 @@ smallest diff on top of what is there. Removing code is often the fix.
 
 - **Find the cause before the first test.** For a fix or a change to existing
   behaviour, read the code path until you can say in one sentence why it
-  behaves that way today. Follow the plan's design decision when it names
+  behaves that way today. Follow the plan's decision when it names
   one. Change the step that causes the behaviour; do not add a second step
   that corrects its effect afterwards.
 - **Delete what the change makes unnecessary**: components, inputs, outputs,

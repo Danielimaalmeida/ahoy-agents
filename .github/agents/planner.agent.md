@@ -125,7 +125,7 @@ When the story involves designs, record the applicable Figma references — file
 
 - Size and split the UI work from what the frames contain: the screens and states, the components, which of them the repository already has.
 - Pin to each UI work package the frames (file and node) it builds, so no frame is left to nobody and none is built twice.
-- Where the design and the acceptance criteria disagree, or the UI shows data no repository provides, ask a question with a recommendation instead of choosing silently. The criteria win unless a person says otherwise; a difference that stays goes in the plan as a design decision.
+- Where the design and the acceptance criteria disagree, or the UI shows data no repository provides, ask a question with a recommendation instead of choosing silently. The criteria win unless a person says otherwise; a difference that stays goes in the plan as a decision.
 - No `design/` means the story links no Figma frame or it could not be read: plan from the links in `jira-source.md` as before, and do not ask for the design.
 
 ### A story with a flow
@@ -171,55 +171,98 @@ Create exactly one prose artifact at `specs/<STORY-ID>/implementation-plan.md`.
 ### Writing the plan
 
 Three kinds of reader use the plan, each for something different. The person
-approving it reads it once to decide. Each implementer reads its own work
-package. The reviewer reads the decisions and the evidence for each criterion.
-Write for them, in that order.
+approving it reads the top once to decide, and must see at a glance what
+changes and what to check. Each implementer reads its own work package. The
+reviewer reads the decisions and the evidence for each criterion. So the plan
+has two parts, divided by a rule (`---`): what a person reads to approve, and
+below it what the implementers and the reviewer need on top of that. Write for
+them, in that order.
 
-**Length limits.** The plan is at most 60 lines, not counting the criteria
-table, the flow's steps and the API contract; a story with more than two
-repositories may add 15 lines for each further repository. Within that:
+**Length limits.** The part above the rule is at most 70 lines of text (empty
+lines do not count), not counting the flow's steps, the API contract and the
+criteria table; a story with more than two repositories may add 15 lines for
+each further repository. Within that:
 
-- Summary: at most 4 lines.
-- Design decisions: at most 5.
-- Each work package: at most 5 bullets.
+- In short: at most 4 lines, and at most 4 checks.
+- Today and after: at most 8 lines.
+- What changes: at most 12 lines for each repository, shared by its work
+  packages.
+- Decisions: at most 5, each of at most 4 lines.
 - Risks: at most 3.
 
 If the plan does not fit, cut repetition and investigation first. Never drop a
 criterion, a decision a person made, or a design reference to fit. The usual
 cause of a long plan is that it says things twice.
 
+- **The top decides.** `In short` says what changes for the people who use it,
+  in plain words, and in which repositories. Under it,
+  `Before you approve, check` says in full each thing the approver must
+  notice: a behaviour that changes, a decision to confirm, a breaking change,
+  an order of release. A bare id (`check D4`) sends the reader looking: write
+  what D4 means for them in one line, and cite the id at its end.
+- **Show the shape before the detail.** `What changes` is a tree, one block
+  for each work package: the files or components the package adds (`+`),
+  changes (`~`) and removes (`-`), and what it reuses as it is where a reader
+  would expect new code (`=`), each with what happens to it in at most ten
+  words, and the ids it serves where it serves one. It lets a person see the
+  size of the change, what is new, what goes and what is duplicated, without
+  reading a sentence. Group files by folder where a repository would need
+  more than 12 lines (`+ features/requests/   routes, list, review page`). A
+  test file is in the tree when it is new or goes, or when its tests must
+  change because the behaviour they pin changes; one that only gains the new
+  tests is not, and no test is named there. A `~`, `-` or `=` line names what
+  you read in the code, by its name there. A `+` line names what will exist,
+  where the repository's layout puts such a thing; where you cannot tell, say
+  what the thing is (`+ a request entity`) and invent no path. The tree is
+  the plan's forecast, not a list of steps: the implementer finds the code by
+  driving it from the test.
+- **For a fix, show one case today and after.** When the story corrects
+  existing behaviour, `Today and after` shows the same small case twice, side
+  by side: a tree, two rows, a request and its answer. Take the ticket's own
+  example where it has one. A reader sees in it what the summary takes a
+  paragraph to say. A story that is not a fix has no such section, and does
+  not name it on the `None:` line.
 - **Say each fact once.** Every fact has one place in the outline below.
   Anywhere else, refer to it by its id (`D2`, `AC3`, `WP1`, `R1`, `Q2`)
-  instead of repeating it. A known gap or an out-of-scope item goes under
-  Scope, and a risk goes under Risks.
-- **Use bullets and tables, not paragraphs.** One idea per bullet, in one or
-  two short sentences. No paragraph runs past four lines.
+  instead of repeating it. Two things are not repetition: the checks under
+  `In short` say in a line what their id says in full, and the tree may name
+  a file a decision names, since the tree says what happens to it and the
+  decision why. A known gap or an out-of-scope item goes under
+  `Not in this delivery`, and a risk goes under Risks.
+- **Use bullets, tables and trees, not paragraphs.** One idea per bullet, in
+  one or two short sentences. No paragraph runs past four lines. Leave an
+  empty line between two decisions: Markdown joins lines that follow each
+  other into one paragraph, and five decisions then read as a wall of text.
 - **Give conclusions, not the investigation.** State what is true and what
   will be built. How you found out (searches you ran, files you read, what you
   cross-checked) goes in `plan-sources.md`.
-- **Do not explain the harness.** Leave out how packages get dispatched and how
-  the gates, `state.json`, branch prefixes and `open_pr` work. Readers know the
-  process. The plan is about this story.
+- **Do not explain the harness, and do not speak its language above the
+  rule.** Leave out how packages get dispatched and how the gates,
+  `state.json`, branch prefixes and `open_pr` work. The person approving is a
+  developer of the team, not of the harness: `seam`, `verification mode`,
+  `native_validation`, `provenance` and `readiness` say nothing to them. Those
+  words, where needed, go below the rule.
 - **Do not retell the ticket or the questions.** The criteria are in the
   table, and the Jira text is in `jira-source.md`. An answered question becomes
-  a scope line or a design decision that cites its id (`(Q2)`). Do not
-  summarise the exchange.
+  a line under `Not in this delivery` or a decision that cites its id
+  (`(Q2)`). Do not summarise the exchange.
 - **A decision is a choice someone could reasonably make differently.** What
   the code, a repository convention or the ticket already forces is not a
   decision: leave it out, or put it in a work package's `Constraint`. Give
   `Rejected:` only when there was a real alternative. A fact about today's code
-  goes inside the decision that depends on it ("Because today …"), not in a
+  goes inside the decision that depends on it (`Why: today …`), not in a
   section of its own.
 - **For a fix, name the cause and what it removes.** When the story corrects
   existing behaviour, read the code until you can say in one line why it
-  behaves that way today, and make the fix a design decision: "Because today
-  <cause>, <change>; this removes <code the change makes unnecessary>". Prefer
+  behaves that way today, and make the fix a decision: "today <cause>, so
+  <change>; this removes <code the change makes unnecessary>". Prefer
   the design that removes the cause over one that corrects its effect
   afterwards; without this decision the implementer patches around the cause.
-  Example: "Because today a faulty element is linked to a parent only after
-  the whole file is parsed, its children land on the nearest valid parent;
+  Example: "Today a faulty element is linked to a parent only after
+  the whole file is parsed, so its children land on the nearest valid parent;
   attach it while parsing, where its parent is already known, and delete the
-  post-parse linking step." Rejected: correcting the post-parse step.
+  post-parse linking step." Rejected: correcting the post-parse step. What it
+  removes is also a `-` line of `What changes`.
 - **Test notes are scenarios, not criteria.** A ticket's test notes, QA notes
   or test checklist say what the evidence should exercise. Derive criteria
   from the behaviour the story asks for; the listed scenarios go into those
@@ -228,30 +271,32 @@ cause of a long plan is that it says things twice.
   behaviour depends on it, a decision when a person settled it (`(Qn)`), and
   is otherwise left out. Seams go on the critical paths, not on every edge
   case.
-- **Name the seam, not the steps.** Implementers work test-first from the
-  criteria and find the code by driving it from the test. For each work
-  package, name the seam (the public interface the tests drive), at most five
-  files or components the work touches, and the constraints the code cannot
-  tell them. Do not list every file, method or step.
-- **Empty sections get no heading.** Name them on the plan's last line,
-  `None: <sections>.`, so the reader knows you considered them.
+- **Below the rule, name the seam, not the steps.** Implementers work
+  test-first from the criteria and find the code by driving it from the test.
+  For each work package, `Tests drive` names the seam (the public interface
+  the tests drive) and `Constraint` what the code cannot tell them. Do not
+  list methods or steps. The names of the tests go in the table there, not in
+  the criteria table above the rule: the person approving reads how many
+  tests prove a criterion, and the implementer and the reviewer read which.
+- **Empty sections get no heading.** Name them on the last line above the
+  rule, `None: <sections>.`, so the reader knows you considered them.
 
 Use this outline, in this order:
 
-```markdown
+````markdown
 # <STORY-ID> — <Jira summary>
 
-Provenance: `plan-sources.md`. Readiness: <Intake analyst's completeness>; questions answered: <Q ids or none>.
+## In short
+At most 4 lines: what changes for the people who use it, and in which repositories.
 
-## Summary
-At most 4 lines: what changes, in which repositories, and anything the approver
-must notice before approving (a known gap, a decision to check, an action
-outside the delivery), by id.
+**Before you approve, check:**
+- <what the approver must notice, in full, in one line> (<its id>).
 
-## Scope
-- In scope: …
-- Out of scope: … — <reason>, citing `(Qn)` where a person decided it.
-- Assumptions: …
+## Today and after
+```
+today                          after
+<one small case as it is>      <the same case as it will be>
+```
 
 ## Flow
 Roles: <role>: <what it may do and see>; <role>: …
@@ -260,25 +305,32 @@ States of <what they act on>: <state> → <state> → <state> or <state>.
 |------|------|------|----------------|-------|------|----|
 | F1 | <role> | <what the person does> | <screen> (`<node>`) | <before> → <after> | <what this role and the next then see> | AC1 |
 
-## Design decisions
-**D1 — <the decision, in one line>.** Because <today's fact, if any>, <why>.
-Rejected: <alternative> — <reason, one clause>.
+## What changes
+```
+<repo alias>    branch <prefix>/<STORY-ID>-<branch_slug>    WP1, <agent>, after <WP ids, only when it waits>
+  + <new file or component>         <what it is for> (<AC and D ids>)
+  ~ <changed file or component>     <what changes in it>
+  - <removed file or component>     <what replaces it>
+  = <reused as it is>               <what uses it>
+```
 
 ## API contract
 - `<METHOD> <path>` (<role>): `{ <request field>: <type> }`; 200 `{ <field>: <type> }`; <status> when <case>.
 
-## Work packages
-### <repo alias> — branch `<prefix>/<STORY-ID>-<branch_slug>`
-**WP1 — <agent>** · after: <WP ids, only when it depends on another package>
-- Seam: <the public interface the tests drive>
-- Touches: <at most 5 files or components>
-- Constraint: <what the code cannot tell the implementer: decision ids, conventions, what not to touch>
-- Design (frontend only): <Figma file, node, what it covers>
-- Flow (a story with one): <the steps this package builds, by id>
+## Decisions
+**D1 — <the decision, in one line>.**
+- Why: <today's fact, if any, and the reason>.
+- Rejected: <alternative>. <reason, one clause>.
 
-## Acceptance criteria and evidence
-| AC | Criterion | WP | Evidence (`test_ids`) |
-|----|-----------|----|-----------------------|
+**D2 — …**
+
+## Not in this delivery
+- <what is out of scope> — <reason>, citing `(Qn)` where a person decided it.
+- Assumed: …
+
+## Acceptance criteria
+| AC | Criterion | WP | Tests |
+|----|-----------|----|-------|
 
 ## Risks
 - R1 — <risk> → <mitigation>
@@ -287,62 +339,110 @@ Rejected: <alternative> — <reason, one clause>.
 ## Actions outside this delivery
 - <manual step that no work package covers> — <who has to do it>
 
-None: <the sections and Scope bullets that have nothing in them>.
-```
+None: <the sections above, and `assumptions`, that have nothing in them; never `today and after`>.
 
-The criteria table uses the same AC ids and `test_ids` literals as
-`state.json`. Its Criterion column shortens `text` to about 12 words. When a
-criterion's mode is not `test`, put the mode in brackets after its anchors:
+---
+
+## For the implementer and the reviewer
+**WP1 — <agent>**
+- Tests drive: <the seam: the public interface the tests drive>
+- Constraint: <what the code cannot tell the implementer: decision ids, conventions, what not to touch>
+- Design (frontend only): <Figma file, node, what it covers>
+- Flow (a story with one): <the steps this package builds, by id>
+
+| AC | Tests (`test_ids`) |
+|----|--------------------|
+
+Sources: `plan-sources.md`. Intake: <Intake analyst's completeness>. Questions answered: <Q ids or none>.
+````
+
+The two criteria tables use the same AC ids as `state.json`. The one above the
+rule shortens `text` to about 12 words and gives, under Tests, how many tests
+prove the criterion; where no test does, it says in two or three words what
+does (`the migration itself`). The one below the rule lists every
+`test_ids` literal as `state.json` has it. When a criterion's mode is not
+`test`, put the mode in brackets after its anchors there:
 `` `build-and-push` (native_validation) ``. Leave the
 `verification_rationale` out: it stays in `state.json`, and the implementer
-receives it from there. Every verification anchor must appear in the table:
-the person approving the plan approves these seams along with the plan, and
-the implementers build test-first against them, so they have to see them.
+receives it from there. Every verification anchor must appear in that table:
+the anchors are part of the plan a person approves, and the implementers
+build test-first against them, so both must find them there. A plan with one
+work package leaves the WP column out of the table above the rule.
 
 This is what a plan looks like. Its story, repository, agent and Figma names
 are invented: take yours from the story, `agent-mappings.md` and the sources
 you read.
 
-```markdown
+````markdown
 # PROJ-123 — Show invoice due date on the billing page
 
-Provenance: `plan-sources.md`. Readiness: complete; questions answered: Q1, Q2.
-
-## Summary
+## In short
 The billing page shows each open invoice's due date and marks the invoice overdue once that date has passed.
-One repository, `billing-web`, one work package; no API change (D1).
-Check D2 before approving: a paid invoice shows no due date.
+One repository, `billing-web`, one work package; no API change.
 
-## Scope
-- In scope: due date and overdue marker in the billing page's invoice list.
-- Out of scope: due-date reminder emails — a separate story `(Q2)`.
+**Before you approve, check:**
+- A paid invoice shows no due date at all, not a struck-through one (D2).
 
-## Design decisions
-**D1 — The page works out "overdue" from `dueDate` and today's date.** Because today the API returns `dueDate` but
-no status for it, this needs no backend change. Rejected: an `isOverdue` field in the API — a backend change for a
-value the page can compute.
-**D2 — A paid invoice shows no due date `(Q1)`.** Because the date no longer applies once the invoice is paid.
+## What changes
+```
+billing-web    branch feature/PROJ-123-invoice-due-date    WP1, billing-web-implementer
+  ~ src/billing/InvoiceRow.tsx     shows the due date and the overdue marker (AC1, AC2)
+  ~ src/billing/InvoiceList.tsx    gives each row today's date; none for a paid invoice (AC3)
+  = formatDate                     formats the due date, like the page's other dates
+```
 
-## Work packages
-### billing-web — branch `feature/PROJ-123-invoice-due-date`
-**WP1 — billing-web-implementer**
-- Seam: `InvoiceList`, rendered with test invoices and a fixed today's date.
-- Touches: `src/billing/InvoiceList.tsx`, `src/billing/InvoiceRow.tsx`.
-- Constraint: dates go through the existing `formatDate` helper; the overdue colour comes from the design tokens.
-- Design: Figma `Billing`, node `412:88`, the invoice row with its due date and overdue state.
+## Decisions
+**D1 — The page works out "overdue" from `dueDate` and today's date.**
+- Why: today the API returns `dueDate` but no status for it, so this needs no backend change.
+- Rejected: an `isOverdue` field in the API. A backend change for a value the page can compute.
 
-## Acceptance criteria and evidence
-| AC  | Criterion                                  | WP  | Evidence (`test_ids`)                         |
-|-----|--------------------------------------------|-----|-----------------------------------------------|
-| AC1 | An open invoice shows its due date         | WP1 | `shows the due date of an open invoice`       |
-| AC2 | An invoice past its due date is overdue    | WP1 | `marks an invoice overdue after its due date` |
-| AC3 | A paid invoice shows no due date           | WP1 | `shows no due date for a paid invoice`        |
+**D2 — A paid invoice shows no due date `(Q1)`.**
+- Why: the date no longer applies once the invoice is paid.
+
+## Not in this delivery
+- Due-date reminder emails — a separate story `(Q2)`.
+
+## Acceptance criteria
+| AC  | Criterion                               | Tests |
+|-----|-----------------------------------------|-------|
+| AC1 | An open invoice shows its due date      | 1     |
+| AC2 | An invoice past its due date is overdue | 1     |
+| AC3 | A paid invoice shows no due date        | 1     |
 
 ## Risks
 - R1 — `dueDate` is in UTC and the page shows local time → AC2's test uses an invoice due at midnight UTC.
 
 None: flow, API contract, assumptions, actions outside this delivery.
+
+---
+
+## For the implementer and the reviewer
+**WP1 — billing-web-implementer**
+- Tests drive: `InvoiceList`, rendered with test invoices and a fixed today's date.
+- Constraint: the overdue colour comes from the design tokens.
+- Design: Figma `Billing`, node `412:88`, the invoice row with its due date and overdue state.
+
+| AC  | Tests (`test_ids`)                            |
+|-----|-----------------------------------------------|
+| AC1 | `shows the due date of an open invoice`       |
+| AC2 | `marks an invoice overdue after its due date` |
+| AC3 | `shows no due date for a paid invoice`        |
+
+Sources: `plan-sources.md`. Intake: complete. Questions answered: Q1, Q2.
+````
+
+A fix adds `Today and after`. This one is from another invented story, the fix
+named above, in which a faulty element lost its children:
+
+````markdown
+## Today and after
 ```
+today                            after
+parent                           parent
+  child of the faulty element      faulty element
+  faulty element                     child of the faulty element
+```
+````
 
 A story with a flow adds the two sections. These are from another invented story, in which a requester sends a
 discount for approval:
@@ -367,16 +467,16 @@ States of a discount: draft → pending → approved or rejected; rejected → p
 - `GET /discounts?status=pending` (approver): 200 `{ items: { id: string, requester: string, amount: number }[] }`.
 ```
 
-Its work packages then name their steps, `- Flow: F1, F4` for the form's and `- Flow: F1 to F4` for the backend's,
-and both name `API contract` in their `Constraint`.
+Its work packages then name their steps below the rule, `- Flow: F1, F4` for the form's and `- Flow: F1 to F4` for the
+backend's, and both name `API contract` in their `Constraint`.
 
 **The plan describes the current design and nothing else.** No "the prior
 revision claimed", no "reversed per this round's feedback", no correction
 notes about what an earlier draft got wrong. That history lives in
 `decision_log`, where each revision round and its reason are already
 recorded; a plan that narrates its own rewrites is read seven times over by
-implementers and reviewers who need none of it. A design decision states the
-decision, the reason, and the alternatives rejected — not when the reasoning
+implementers and reviewers who need none of it. A decision states what was
+decided, the reason, and the alternatives rejected — not when the reasoning
 changed.
 
 Keep unresolved assumptions explicit. Only after repository-context inspection and clarification are complete may you produce the implementation plan. Do not execute implementation, modify child repositories, or update Jira.
@@ -495,7 +595,7 @@ The test names you put in `test_ids` are also the seams the implementer works
 at test-first, and the person who approves the plan approves them with it.
 Name each one after the behaviour it proves, at the public interface where the
 behaviour is observable, so the implementer never has to ask which seam to
-test. That interface is the work package's `Seam` in the plan.
+test. That interface is the work package's `Tests drive` line in the plan.
 
 **Plan as few tests as prove the criteria.** The implementer writes every test
 you name, and the team maintains it. A plan that names a test per scenario
@@ -528,8 +628,13 @@ your output against what the gate requires instead:
 - `plan_path` is set and the file exists.
 - The plan is within the length limits in "Writing the plan" (no gate checks
   this; the people who read the plan do).
-- For a fix, a design decision names the cause and the code the change
-  removes.
+- For a fix, a decision names the cause and the code the change removes,
+  and `Today and after` shows one case.
+- `What changes` gives what exists its name in the code and invents no path
+  for what does not; the decisions have an empty line between them.
+- Above the rule none of `seam`, `verification mode`, `native_validation`,
+  `provenance` and `readiness` appears, and each check under `In short` says
+  in full what the approver must notice.
 - A story in which more than one role acts, or what they act on changes
   state, has `## Flow`: every criterion of the flow is in a step, and no
   state or view is a guess. Its packages that meet at an endpoint have
@@ -615,7 +720,9 @@ rewrite makes the human re-read everything to find your one change. Edit the
 plan in place so it describes the new design as if it had always been the
 design; the round history is already in `decision_log`. The length limits in
 "Writing the plan" still apply: a revision replaces text, it does not add to
-it. Update `plan-sources.md` with anything new you inspected.
+it. A plan written in an earlier outline keeps that outline through its
+revisions: moving it to the outline above is the rewrite this section
+forbids. Update `plan-sources.md` with anything new you inspected.
 
 If what they asked for is ambiguous, ask before editing, through
 `questions.json`.
